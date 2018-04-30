@@ -4,6 +4,12 @@
 
 'use strict';
 
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+
 var LDAvis = function(to_select, data_or_file_name) { //added additional input variable
 
     // This section sets up the logic for event handling
@@ -1041,8 +1047,11 @@ var LDAvis = function(to_select, data_or_file_name) { //added additional input v
             var d = circle.__data__;
             var Freq = Math.round(d.Freq * 10) / 10,
                 topics = d.topics;
+            var circletext = d3.select('#' + (circle.id).replace("topic", "text"))
+            circletext.style("opacity", 1)
+            circletext.moveToFront()
+            d3.select(circle).moveToFront()
 
-            d3.select('#' + (circle.id).replace("topic", "text")).style("opacity", 1)
             // change opacity and fill of the selected circle
             circle.style.opacity = highlight_opacity;
             circle.style.fill = color2;
