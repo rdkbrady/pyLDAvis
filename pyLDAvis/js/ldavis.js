@@ -4,7 +4,7 @@
 
 'use strict';
 
-var LDAvis = function(to_select, data_or_file_name) {
+var LDAvis = function(to_select, data_or_file_name) { //added additional input variable
 
     // This section sets up the logic for event handling
     var current_clicked = {
@@ -35,6 +35,9 @@ var LDAvis = function(to_select, data_or_file_name) {
             old: 1,
             current: 1
         },
+		 // --------- for THE ONE ---------
+		topicNames = [],
+		// --------- nomore for THE ONE -----------
         color1 = "#1f77b4", // baseline color for default topic circles and overall term frequencies
         color2 = "#d62728"; // 'highlight' color for selected topics and term-topic frequencies
 
@@ -105,13 +108,33 @@ var LDAvis = function(to_select, data_or_file_name) {
 
 
     function visualize(data) {
-
         // set the number of topics to global variable K:
         K = data['mdsDat'].x.length;
 
         // R is the number of top relevant (or salient) words whose bars we display
         R = Math.min(data['R'], 30);
 
+		// ----------- fuse for THE ONE ------------
+		var cut_names=0;
+		if(data['mdsDat'].hasOwnProperty('topic.names')){ //if by anycase length of NAMES variable doesn't match overall amount of topics OR variable doesnt exists - set names to numbers
+			if (K!=data['mdsDat']['topic.names'].length){
+				cut_names=1;
+			}
+		} else{
+			cut_names=1;
+		}
+		if (cut_names==1) {
+			for (var i = 0; i < K; i++) {
+				topicNames[i] = i+1;
+			}
+		}
+		else{
+			for (var i = 0; i < K; i++) {
+				topicNames[i] = data['mdsDat']['topic.names'][i];
+            }
+		}
+		// ----------- enough for THE ONE ------------
+		
         // a (K x 5) matrix with columns x, y, topics, Freq, cluster (where x and y are locations for left panel)
         mdsData = [];
         for (var i = 0; i < K; i++) {
@@ -349,7 +372,7 @@ var LDAvis = function(to_select, data_or_file_name) {
             .attr('class', "circleGuideTitle")
             .style("text-anchor", "left")
             .style("fontWeight", "bold")
-            .text("Marginal topic distribution");
+            .text("Marginal topic distribtion");
         d3.select("#" + leftPanelID).append("text")
             .attr("x", cx2 + 10)
             .attr("y", mdsheight + 2 * newSmall)
@@ -375,6 +398,7 @@ var LDAvis = function(to_select, data_or_file_name) {
                 .enter();
 
         // text to indicate topic
+		// ------------------ THE ONE -------------------
         points.append("text")
             .attr("class", "txt")
             .attr("x", function(d) {
@@ -389,8 +413,9 @@ var LDAvis = function(to_select, data_or_file_name) {
             .style("font-size", "11px")
             .style("fontWeight", 100)
             .text(function(d) {
-                return d.topics;
+                return topicNames[d.topics-1]; // only one that changed from d.topics to topicNames[d.topics-1]
             });
+		// ------------------ THE ONE finished-------------------
 
         // draw circles
         points.append("circle")
@@ -410,6 +435,7 @@ var LDAvis = function(to_select, data_or_file_name) {
             .attr("stroke", "black")
             .attr("id", function(d) {
                 return (topicID + d.topics);
+				
             })
             .on("mouseover", function(d) {
                 var old_topic = topicID + vis_state.topic;
