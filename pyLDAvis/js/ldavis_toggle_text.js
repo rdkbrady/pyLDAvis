@@ -419,6 +419,7 @@ var LDAvis = function(to_select, data_or_file_name) { //added additional input v
             .style("text-anchor", "middle")
             .style("font-size", "11px")
             .style("fontWeight", 100)
+            .style("pointer-events", 'none')
             .attr("id", function(d) {
                 return (textID + d.topics);
             })
@@ -1049,8 +1050,8 @@ var LDAvis = function(to_select, data_or_file_name) { //added additional input v
                 topics = d.topics;
             var circletext = d3.select('#' + (circle.id).replace("topic", "text"))
             circletext.style("opacity", 1)
-            circletext.moveToFront()
             d3.select(circle).moveToFront()
+            circletext.moveToFront()
 
             // change opacity and fill of the selected circle
             circle.style.opacity = highlight_opacity;
